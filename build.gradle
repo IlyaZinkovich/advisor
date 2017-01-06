@@ -1,0 +1,35 @@
+group 'com.routes'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE')
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    compile.exclude group: 'commons-logging', module: 'commons-logging'
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'com.flickr4java', name: 'flickr4java', version: '2.16'
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.8.8'
+    compile group: 'com.google.maps', name: 'google-maps-services', version: '0.1.17'
+    compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1211.jre7'
+    compile ('org.springframework.boot:spring-boot-starter-web')
+    compile ('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile ('org.springframework.boot:spring-boot-devtools')
+}

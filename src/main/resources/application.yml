@@ -1,0 +1,21 @@
+server:
+  port: 8881
+
+flickr:
+  apiKey: 7702646706f40b6c735fec76b0dd1cb5
+  secret: 5a0bf605f48d7d6c
+  photosPerPage: 1000
+
+google:
+  apiKey: AIzaSyBAHZ3gLdePXcY1GbHpQM3PEfAGwLB3lyA
+
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/routesdb
+    username: postgres
+    password: postgres
+  jpa:
+#    hibernate:
+#      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
