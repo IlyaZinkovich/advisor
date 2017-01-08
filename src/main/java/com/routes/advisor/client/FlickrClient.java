@@ -6,6 +6,7 @@ import com.flickr4java.flickr.people.User;
 import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotoList;
 import com.flickr4java.flickr.photos.SearchParameters;
+import com.routes.advisor.model.Place;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,13 +33,13 @@ public class FlickrClient {
     @Value("${flickr.photosPerPage}")
     private int photosPerPage;
 
-    public List<String> searchTravelers(Year year, Month month, double latitude, double longitude) {
-        PhotoList<Photo> photos = getPhotos(year, month, latitude, longitude);
+    public List<String> searchTravelers(Month month, Year year, Place place) {
+        PhotoList<Photo> photos = getPhotos(month, year, place.getLatitude(), place.getLongitude());
         return getPhotosOwnerLocation(photos);
     }
 
-    private PhotoList<Photo> getPhotos(Year year, Month month, double latitude, double longitude) {
-        SearchParameters parameters = getSearchParametersForLocation(year, month, latitude, longitude);
+    private PhotoList<Photo> getPhotos(Month month, Year year, double latitude, double longitude) {
+        SearchParameters parameters = getSearchParametersForLocation(month, year, latitude, longitude);
         PhotoList<Photo> photos = searchPhotos(parameters, FIRST_PAGE, photosPerPage);
         for (int page = SECOND_PAGE; page < photos.getPages(); page++) {
             photos.addAll(searchPhotos(parameters, page, photosPerPage));
@@ -46,7 +47,7 @@ public class FlickrClient {
         return photos;
     }
 
-    private static SearchParameters getSearchParametersForLocation(Year year, Month month,
+    private static SearchParameters getSearchParametersForLocation(Month month, Year year,
                                                                    double latitude, double longitude) {
         SearchParameters parameters = new SearchParameters();
         parameters.setLatitude(String.valueOf(latitude));

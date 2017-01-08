@@ -15,10 +15,10 @@
             <pattern>${pattern}</pattern>
         </encoder>
 
-        <file>${logdir}/rest-stub.log</file>
+        <file>${logdir}/advisor.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${logdir}/rest-stub.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${logdir}/advisor.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>10</MaxIndex>
         </rollingPolicy>
