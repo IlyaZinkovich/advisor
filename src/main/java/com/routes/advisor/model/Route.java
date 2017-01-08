@@ -8,22 +8,16 @@ public class Route {
     private Place fromPlace;
     private Place toPlace;
     private LocalDate date;
-    private Period period;
     private String source;
-
-    public enum Period {
-        DAY, MONTH
-    }
 
     public Route() {
     }
 
-    public Route(Place fromPlace, Place toPlace, LocalDate date, Period period, String source) {
+    public Route(Place fromPlace, Place toPlace, LocalDate date, String source) {
         this.fromPlace = fromPlace;
         this.toPlace = toPlace;
         this.date = date;
         this.source = source;
-        this.period = period;
     }
 
     public Long getId() {
@@ -44,10 +38,6 @@ public class Route {
 
     public LocalDate getDate() {
         return date;
-    }
-
-    public Period getPeriod() {
-        return period;
     }
 
     public String getSource() {

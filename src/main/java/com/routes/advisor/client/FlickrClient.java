@@ -7,6 +7,7 @@ import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotoList;
 import com.flickr4java.flickr.photos.SearchParameters;
 import com.routes.advisor.model.Place;
+import com.routes.advisor.model.Trip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,10 +16,12 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 public class FlickrClient {
@@ -26,6 +29,7 @@ public class FlickrClient {
     private static final int FIRST_DAY = 1;
     private static final int FIRST_PAGE = 0;
     private static final int SECOND_PAGE = 1;
+    private static final String DATE_TAKEN_EXTRA = "date_taken";
 
     @Autowired
     private Flickr flickr;
@@ -33,9 +37,9 @@ public class FlickrClient {
     @Value("${flickr.photosPerPage}")
     private int photosPerPage;
 
-    public List<String> searchTravelers(Month month, Year year, Place place) {
+    public List<Trip> searchTrips(Month month, Year year, Place place) {
         PhotoList<Photo> photos = getPhotos(month, year, place.getLatitude(), place.getLongitude());
-        return getPhotosOwnerLocation(photos);
+        return getTrips(photos);
     }
 
     private PhotoList<Photo> getPhotos(Month month, Year year, double latitude, double longitude) {
@@ -54,6 +58,7 @@ public class FlickrClient {
         parameters.setLongitude(String.valueOf(longitude));
         parameters.setMaxTakenDate(Date.valueOf(LocalDate.of(year.getValue(), month, FIRST_DAY)));
         parameters.setMinTakenDate(Date.valueOf(LocalDate.of(year.getValue(), month, month.length(year.isLeap()))));
+        parameters.setExtras(Collections.singleton(DATE_TAKEN_EXTRA));
         return parameters;
     }
 
@@ -65,12 +70,14 @@ public class FlickrClient {
         }
     }
 
-    private List<String> getPhotosOwnerLocation(PhotoList<Photo> photos) {
+    private List<Trip> getTrips(PhotoList<Photo> photos) {
         return photos.stream()
-                .map(Photo::getOwner)
+                .collect(toMap(Photo::getOwner, photo -> photo, (photo, owner) -> photo)).values()
+                .stream()
+                .map(photo -> new Trip(getUserLocation(photo.getOwner()),
+                        LocalDate.from(photo.getDateTaken().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())))
                 .distinct()
-                .map(this::getUserLocation)
-                .filter(Objects::nonNull)
+                .filter(trip -> trip.getOrigin() != null)
                 .collect(toList());
     }
 

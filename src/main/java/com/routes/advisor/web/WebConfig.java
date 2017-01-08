@@ -33,7 +33,6 @@ public class WebConfig {
         return new CorsFilter(source);
     }
 
-
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
