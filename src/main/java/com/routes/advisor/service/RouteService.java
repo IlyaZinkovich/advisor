@@ -13,8 +13,11 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.*;
+import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -34,12 +37,17 @@ public class RouteService {
         return getRoutes(city, country, startDate.getMonth().toString(), startDate.getYear());
     }
 
-    public List<Route> getRoutes(String city, String country, String month, Integer year) {
+    private List<Route> getRoutes(String city, String country, String month, Integer year) {
+        Place destination = geolocationService.findPlace(city + ", " + country);
+        return destination.isKnown() ? getRoutesFromKnownDestination(city, country, month, year, destination)
+                : emptyList();
+    }
+
+    private List<Route> getRoutesFromKnownDestination(String city, String country, String month, Integer year, Place destination) {
         List<Route> routes = routesRepository.findByDestinationAndDataRange(city, country,
                 LocalDate.of(year, Month.valueOf(month), 1),
                 LocalDate.of(year, Month.valueOf(month), Month.valueOf(month).length(Year.isLeap(year))));
         if (routes.isEmpty()) {
-            Place destination = geolocationService.findPlace(city + ", " + country);
             routes = getRoutesFromFlickr(month, year, destination);
             routes.forEach(this::saveRoute);
         }
@@ -50,6 +58,7 @@ public class RouteService {
         List<Trip> strings = flickrClient.searchTrips(Month.valueOf(month), Year.of(year), destination);
         return strings.stream()
                 .map(trip -> new GeoTaggedTrip(geolocationService.findPlace(trip.getOrigin()), trip.getDate()))
+                .filter(trip -> trip.getOrigin().isKnown())
                 .filter(trip -> !samePlace(destination, trip.getOrigin()))
                 .map(trip -> new Route(trip.getOrigin(), destination, trip.getDate(), "Flickr"))
                 .collect(toList());

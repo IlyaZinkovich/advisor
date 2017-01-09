@@ -6,6 +6,7 @@ import com.google.maps.model.AddressComponentType;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
 import com.routes.advisor.model.Place;
+import com.routes.advisor.model.UnknownPlace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,8 +34,12 @@ public class GoogleGeocodingClient {
     public Place findPlace(String name) {
         GeocodingResult[] geocodingResults = getLocation(name, context);
         if (geocodingResults.length == 0)
-            return new Place(name, name, null, null);
+            return new UnknownPlace(name, name, null, null);
         GeocodingResult geocodingResult = geocodingResults[0];
+        return findKnownPlace(geocodingResult);
+    }
+
+    private Place findKnownPlace(GeocodingResult geocodingResult) {
         String city = null;
         String country = null;
         for (AddressComponent addressComponent : geocodingResult.addressComponents) {

@@ -15,7 +15,3 @@ spring:
     url: jdbc:postgresql://localhost:5432/routesdb
     username: postgres
     password: postgres
-  jpa:
-#    hibernate:
-#      ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect

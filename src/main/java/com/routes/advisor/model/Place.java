@@ -29,4 +29,8 @@ public class Place {
     public Double getLongitude() {
         return longitude;
     }
+
+    public boolean isKnown() {
+        return true;
+    }
 }
